@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Realidad Aumentada Video</title>
+  <!-- Incluir AR.js y A-Frame -->
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.7/aframe/build/aframe-ar.js"></script>
+  <style>
+    body, html { margin: 0; padding: 0; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <!-- Patrón de marcador para activar la AR (puedes usar un patrón personalizado) -->
+    <a-marker preset="hiro">
+      <!-- Definir un plano donde se reproducirá el video -->
+      <a-video 
+        src="#videoAR" 
+        position="0 0.5 0" 
+        rotation="-90 0 0" 
+        width="1" 
+        height="0.5"
+        autoplay>
+      </a-video>
+    </a-marker>
+    <!-- Cámara para la escena AR -->
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <!-- Definir el video que se reproducirá -->
+  <video id="videoAR" src="https://drive.google.com/file/d/1jaOo4M3B5wprPomc1H6hBKRKdygAcwYw/view?usp=drivesdk" autoplay loop style="display: none;"></video>
+
+  <script>
+    // Comprobar permisos de cámara y manejo de errores
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function (stream) {
+        console.log("Acceso a la cámara concedido");
+      })
+      .catch(function (error) {
+        console.error("Error al acceder a la cámara: ", error.name, error.message);
+        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+          alert("El acceso a la cámara ha sido denegado. Por favor, revisa los permisos de la cámara en tu navegador.");
+        } else if (error.name === 'NotFoundError') {
+          alert("No se ha encontrado una cámara en el dispositivo.");
+        } else {
+          alert("Error desconocido al intentar acceder a la cámara.");
+        }
+      });
+
+    // Verificar si la página está corriendo en HTTPS
+    if (window.location.protocol !== 'https:') {
+      console.warn("Es recomendable usar HTTPS para evitar problemas de permisos con la cámara.");
+      alert("Advertencia: se recomienda usar HTTPS para garantizar el acceso correcto a la cámara.");
+    }
+  </script>
+</body>
+</html>
