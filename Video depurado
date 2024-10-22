@@ -34,7 +34,7 @@
   </a-scene>
 
   <!-- Video oculto para la reproducción en AR -->
-  <video id="videoAR" src="https://drive.google.com/file/d/1jaOo4M3B5wprPomc1H6hBKRKdygAcwYw/view?usp=drivesdk" autoplay loop style="display: none;"></video>
+  <video id="videoAR" src="https://drive.google.com/file/d/1jaOo4M3B5wprPomc1H6hBKRKdygAcwYw/view?usp=drivesdk" autoplay loop style="display: true;"></video>
 
   <script>
     // Función para verificar permisos de la cámara
