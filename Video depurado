@@ -24,7 +24,13 @@
         autoplay>
       </a-video>
     </a-marker>
-    <a-entity camera></a-entity>
+    <input type="button" value="Say hello" onClick="showCamera('Android! Start Camera')" />
+
+<script type="text/javascript">
+    function showCamera(toast) {
+        Android.showCamera(toast);
+    }
+</script>
   </a-scene>
 
   <!-- Video oculto para la reproducción en AR -->
