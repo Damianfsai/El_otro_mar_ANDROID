@@ -45,16 +45,16 @@
     <a-marker preset="kanji">
       <a-video 
         id="arVideo"
-        position="0 0.5 0" 
+        position="0 0 0" 
         rotation="-90 0 0" 
-        width="2" 
-        height="1"
+        width="1" 
+        height="0.5"
         autoplay
         playsinline
         crossorigin="anonymous">
       </a-video>
     </a-marker>
-    <a-entity camera></a-entity>
+    <a-entity camera fov="70"></a-entity>
   </a-scene>
 
   <!-- Video oculto que será utilizado en AR -->
