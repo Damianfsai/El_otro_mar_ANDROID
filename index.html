@@ -45,24 +45,25 @@
     <button id="startButton">Iniciar AR</button>
   </div>
 
- <a-scene embedded arjs="sourceType: webcam; sourceWidth: 1280; sourceHeight: 720; displayWidth: 640; displayHeight: 480; debugUIEnabled: false;">
-  <a-marker preset="kanji" emitevents="true">
-    <a-video 
-      id="arVideo"
-      scale="0.5 0.5 0.5"
-      position="00 00 1.5" <!-- Modificar aquí sólo el eje Z -->
-      rotation="-90 0 0" 
-      width="1" 
-      height="0.5"
-      autoplay
-      playsinline
-      crossorigin="anonymous">
-    </a-video>
-  </a-marker>
-  <!-- Ajusta el campo de visión de la cámara -->
-  <a-entity camera fov="150"></a-entity>
-</a-scene>
+  <a-scene embedded arjs="sourceType: webcam; sourceWidth: 1280; sourceHeight: 720; displayWidth: 640; displayHeight: 480; debugUIEnabled: false;">
+    <a-marker preset="kanji" emitevents="true">
+      <a-video 
+        id="arVideo"
+        scale="0.5 0.5 0.5"
+        position="-1 0 0.5" 
+        rotation="-90 0 0" 
+        width="1" 
+        height="0.5"
+        autoplay="false" <!-- Evita que se reproduzca automáticamente -->
+        playsinline
+        crossorigin="anonymous"
+        visible="false"> <!-- Oculta el video inicialmente -->
+      </a-video>
+    </a-marker>
+    <a-entity camera fov="30"></a-entity> <!-- Ajusta el campo de visión -->
+  </a-scene>
 
+  <!-- Video oculto que se usa para reproducir en AR -->
   <video id="videoAR" loop playsinline style="display: none;">
     <source src="MVI_1034_1.mp4" type="video/mp4">
     Tu navegador no soporta la reproducción de este video.
@@ -100,12 +101,13 @@
       buttonContainer.classList.add('hidden'); 
       videoAR.play(); 
       videoReady = true;
-      startButton.blur(); // Remover el foco del botón para asegurar el inicio del video en móviles
+      startButton.blur();
     });
 
     document.querySelector('a-marker').addEventListener('markerFound', function() {
       if (videoReady) {
-        arVideo.setAttribute('src', '#videoAR'); 
+        arVideo.setAttribute('src', '#videoAR');
+        arVideo.setAttribute('visible', 'true'); // Muestra el video en AR
         videoAR.play().then(() => {
           console.log("Reproducción de video iniciada.");
         }).catch(error => {
@@ -118,6 +120,7 @@
 
     document.querySelector('a-marker').addEventListener('markerLost', function() {
       videoAR.pause();
+      arVideo.setAttribute('visible', 'false'); // Oculta el video en AR
     });
   </script>
 
