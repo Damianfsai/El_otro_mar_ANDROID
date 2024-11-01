@@ -45,22 +45,23 @@
     <button id="startButton">Iniciar AR</button>
   </div>
 
-  <a-scene embedded arjs="sourceType: webcam; sourceWidth: 1280; sourceHeight: 720; displayWidth: 640; displayHeight: 480; debugUIEnabled: false;">
-    <a-marker preset="kanji" emitevents="true">
-      <a-video 
-        id="arVideo"
-        scale="0.5 0.5 0.5"
-        position="0 0 0"
-        rotation="-90 0 0" 
-        width="1" 
-        height="0.5"
-        autoplay
-        playsinline
-        crossorigin="anonymous">
-      </a-video>
-    </a-marker>
-    <a-entity camera fov="70"></a-entity>
-  </a-scene>
+ <a-scene embedded arjs="sourceType: webcam; sourceWidth: 1280; sourceHeight: 720; displayWidth: 640; displayHeight: 480; debugUIEnabled: false;">
+  <a-marker preset="kanji" emitevents="true">
+    <a-video 
+      id="arVideo"
+      scale="0.5 0.5 0.5"
+      position="0 0 0.5" <!-- Modificar aquí sólo el eje Z -->
+      rotation="-90 0 0" 
+      width="1" 
+      height="0.5"
+      autoplay
+      playsinline
+      crossorigin="anonymous">
+    </a-video>
+  </a-marker>
+  <!-- Ajusta el campo de visión de la cámara -->
+  <a-entity camera fov="60"></a-entity>
+</a-scene>
 
   <video id="videoAR" loop playsinline style="display: none;">
     <source src="MVI_1034_1.mp4" type="video/mp4">
