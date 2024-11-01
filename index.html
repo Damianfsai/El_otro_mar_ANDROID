@@ -8,11 +8,19 @@
   <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.7/aframe/build/aframe-ar.js"></script>
   <style>
     body, html { margin: 0; padding: 0; overflow: hidden; }
-    #startButton {
+    #buttonContainer {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+    }
+    #startButton {
       padding: 20px;
       background-color: #007bff;
       color: white;
@@ -20,9 +28,8 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      z-index: 1000;
     }
-    #startButton.hidden {
+    #buttonContainer.hidden {
       display: none;
     }
     a-scene {
@@ -33,7 +40,10 @@
 </head>
 <body>
 
-  <button id="startButton">Iniciar AR</button>
+  <!-- Contenedor para el botón -->
+  <div id="buttonContainer">
+    <button id="startButton">Iniciar AR</button>
+  </div>
 
   <a-scene embedded arjs="sourceType: webcam; sourceWidth: 1280; sourceHeight: 720; displayWidth: 640; displayHeight: 480; debugUIEnabled: false;">
     <a-marker preset="kanji" emitevents="true">
@@ -49,4 +59,66 @@
         crossorigin="anonymous">
       </a-video>
     </a-marker>
-    <a-entity camera fov="70"></
+    <a-entity camera fov="70"></a-entity>
+  </a-scene>
+
+  <video id="videoAR" loop playsinline style="display: none;">
+    <source src="MVI_1034_1.mp4" type="video/mp4">
+    Tu navegador no soporta la reproducción de este video.
+  </video>
+
+  <script>
+    var videoAR = document.getElementById('videoAR');
+    var arVideo = document.getElementById('arVideo');
+    var startButton = document.getElementById('startButton');
+    var buttonContainer = document.getElementById('buttonContainer');
+    var videoReady = false;
+
+    videoAR.addEventListener('error', function() {
+      console.error("Error al cargar el video. Verifica la URL o la política de CORS.");
+    });
+
+    videoAR.addEventListener('loadeddata', function() {
+      console.log("Video cargado correctamente y listo para reproducirse.");
+      videoReady = true;
+    });
+
+    window.addEventListener('load', function () {
+      if (isMobile()) {
+        buttonContainer.classList.remove('hidden');
+      } else {
+        videoAR.play(); 
+      }
+    });
+
+    function isMobile() {
+      return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    }
+
+    startButton.addEventListener('click', function () {
+      buttonContainer.classList.add('hidden'); 
+      videoAR.play(); 
+      videoReady = true;
+      startButton.blur(); // Remover el foco del botón para asegurar el inicio del video en móviles
+    });
+
+    document.querySelector('a-marker').addEventListener('markerFound', function() {
+      if (videoReady) {
+        arVideo.setAttribute('src', '#videoAR'); 
+        videoAR.play().then(() => {
+          console.log("Reproducción de video iniciada.");
+        }).catch(error => {
+          console.error("Error al intentar reproducir el video: ", error);
+        });
+      } else {
+        console.error("El video aún no está listo para reproducirse.");
+      }
+    });
+
+    document.querySelector('a-marker').addEventListener('markerLost', function() {
+      videoAR.pause();
+    });
+  </script>
+
+</body>
+</html>
