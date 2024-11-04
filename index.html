@@ -17,7 +17,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: rgba(0, 0, 0, 0.7);
+      background: transparent; /* Cambiado a transparente */
       z-index: 1000;
     }
     #startButton {
@@ -54,13 +54,13 @@
         rotation="-40 0 0" 
         width="1" 
         height="0.5"
-        autoplay="false" <!-- Evita que se reproduzca automáticamente -->
+        autoplay="false"
         playsinline
         crossorigin="anonymous"
-        visible="false"> <!-- Oculta el video inicialmente -->
+        visible="false">
       </a-video>
     </a-marker>
-    <a-entity camera fov="20"></a-entity> <!-- Ajusta el campo de visión -->
+    <a-entity camera fov="20"></a-entity>
   </a-scene>
 
   <!-- Video oculto que se usa para reproducir en AR -->
@@ -76,10 +76,6 @@
     var buttonContainer = document.getElementById('buttonContainer');
     var videoReady = false;
 
-    videoAR.addEventListener('error', function() {
-      console.error("Error al cargar el video. Verifica la URL o la política de CORS.");
-    });
-
     videoAR.addEventListener('loadeddata', function() {
       console.log("Video cargado correctamente y listo para reproducirse.");
       videoReady = true;
@@ -88,8 +84,6 @@
     window.addEventListener('load', function () {
       if (isMobile()) {
         buttonContainer.classList.remove('hidden');
-      } else {
-        videoAR.play(); 
       }
     });
 
@@ -98,16 +92,15 @@
     }
 
     startButton.addEventListener('click', function () {
-      buttonContainer.classList.add('hidden'); 
-      videoAR.play(); 
-      videoReady = true;
+      buttonContainer.classList.add('hidden');
       startButton.blur();
     });
 
     document.querySelector('a-marker').addEventListener('markerFound', function() {
       if (videoReady) {
         arVideo.setAttribute('src', '#videoAR');
-        arVideo.setAttribute('visible', 'true'); // Muestra el video en AR
+        arVideo.setAttribute('visible', 'true');
+        videoAR.currentTime = 0;  // Reinicia el video desde el inicio
         videoAR.play().then(() => {
           console.log("Reproducción de video iniciada.");
         }).catch(error => {
@@ -120,7 +113,7 @@
 
     document.querySelector('a-marker').addEventListener('markerLost', function() {
       videoAR.pause();
-      arVideo.setAttribute('visible', 'false'); // Oculta el video en AR
+      arVideo.setAttribute('visible', 'false');
     });
   </script>
 
