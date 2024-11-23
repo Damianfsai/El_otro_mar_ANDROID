@@ -1,69 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MindAR.js Video con Hiro</title>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.3.0/dist/mindar-face.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.3.0/dist/mindar-image-three.prod.js"></script>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-    canvas {
-      display: block;
-    }
-  </style>
-</head>
-<body>
-  <!-- Contenedor para la realidad aumentada -->
-  <div id="ar-container"></div>
-
-  <script>
-    // Configuración inicial de MindAR.js
-    const startAR = async () => {
+<script>
+  const startAR = async () => {
+    try {
       const mindarThree = new window.MindAR.IMAGE.MindARThree({
         container: document.body,
-        imageTargetSrc: "hiro.mind", // Archivo de marcador Hiro
+        imageTargetSrc: "hiro.mind", // Archivo del marcador
       });
 
       const { renderer, scene, camera } = mindarThree;
 
-      // Cargar video y texturizarlo en un plano
+      // Configurar video en un plano
       const video = document.createElement("video");
-      video.src = "MVI_1034_1.mp4"; // Ruta al video
+      video.src = "MVI_1034_1.mp4";
       video.loop = true;
       video.crossOrigin = "anonymous";
       video.playsInline = true;
-
-      // Espera a que el video cargue y comience a reproducirse
       video.addEventListener("canplay", () => video.play());
 
-      // Crear un plano para mostrar el video
       const videoTexture = new THREE.VideoTexture(video);
-      const planeGeometry = new THREE.PlaneGeometry(1, 0.6); // Ajusta el tamaño del plano
+      const planeGeometry = new THREE.PlaneGeometry(1, 0.6);
       const planeMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
       const videoPlane = new THREE.Mesh(planeGeometry, planeMaterial);
 
-      // Configurar el ancla para el marcador
-      const anchor = mindarThree.addAnchor(0); // Primer marcador en el archivo .mind
+      const anchor = mindarThree.addAnchor(0); // Primer marcador
       anchor.group.add(videoPlane);
 
-      // Iniciar el sistema de AR
+      // Inicia el sistema de realidad aumentada
       await mindarThree.start();
 
-      // Renderizar el contenido
+      // Renderizar
       const render = () => {
         renderer.render(scene, camera);
         requestAnimationFrame(render);
       };
       render();
-    };
+    } catch (error) {
+      console.error("Error iniciando la AR:", error);
+      alert(
+        "No se pudo iniciar la cámara. Por favor, verifica los permisos o usa un navegador compatible."
+      );
+    }
+  };
 
-    // Llamar a la función para iniciar
-    startAR();
-  </script>
-</body>
-</html>
+  startAR();
+</script>
