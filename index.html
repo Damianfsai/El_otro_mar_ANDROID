@@ -8,7 +8,7 @@
 
       const { renderer, scene, camera } = mindarThree;
 
-      // Configurar video en un plano
+      // Configuración del video
       const video = document.createElement("video");
       video.src = "MVI_1034_1.mp4";
       video.loop = true;
@@ -21,23 +21,35 @@
       const planeMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
       const videoPlane = new THREE.Mesh(planeGeometry, planeMaterial);
 
-      const anchor = mindarThree.addAnchor(0); // Primer marcador
+      const anchor = mindarThree.addAnchor(0);
       anchor.group.add(videoPlane);
 
-      // Inicia el sistema de realidad aumentada
+      // Intentar iniciar la AR
       await mindarThree.start();
 
-      // Renderizar
+      // Renderizar la escena
       const render = () => {
         renderer.render(scene, camera);
         requestAnimationFrame(render);
       };
       render();
     } catch (error) {
-      console.error("Error iniciando la AR:", error);
-      alert(
-        "No se pudo iniciar la cámara. Por favor, verifica los permisos o usa un navegador compatible."
-      );
+      console.error("Error iniciando la cámara:", error);
+
+      // Mostrar mensajes específicos según el error
+      if (error.name === "NotAllowedError") {
+        alert(
+          "Permiso denegado. Habilita el acceso a la cámara en la configuración de tu navegador."
+        );
+      } else if (error.name === "NotFoundError") {
+        alert(
+          "No se encontró una cámara en este dispositivo. Por favor, conecta una cámara y vuelve a intentarlo."
+        );
+      } else {
+        alert(
+          "No se pudo iniciar la cámara. Asegúrate de estar usando HTTPS y un navegador compatible."
+        );
+      }
     }
   };
 
