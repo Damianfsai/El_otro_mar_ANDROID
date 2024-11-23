@@ -1,121 +1,69 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Realidad Aumentada Video</title>
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.7/aframe/build/aframe-ar.js"></script>
+  <title>MindAR.js Video con Hiro</title>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.3.0/dist/mindar-face.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.3.0/dist/mindar-image-three.prod.js"></script>
   <style>
-    body, html { margin: 0; padding: 0; overflow: hidden; }
-    #buttonContainer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: transparent; /* Cambiado a transparente */
-      z-index: 1000;
+    body {
+      margin: 0;
+      overflow: hidden;
     }
-    #startButton {
-      padding: 20px;
-      background-color: #007bff;
-      color: white;
-      font-size: 18px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #buttonContainer.hidden {
-      display: none;
-    }
-    a-scene {
-      position: relative;
-      z-index: 0;
+    canvas {
+      display: block;
     }
   </style>
 </head>
 <body>
-
-  <!-- Contenedor para el botón -->
-  <div id="buttonContainer">
-    <button id="startButton">Iniciar AR</button>
-  </div>
-
-  <a-scene embedded arjs="sourceType: webcam; sourceWidth: 1280; sourceHeight: 720; displayWidth: 640; displayHeight: 480; debugUIEnabled: false;">
-    <a-marker preset="kanji" emitevents="true">
-      <a-video 
-        id="arVideo"
-        scale="0.5 0.5 0.5"
-        position="-1 -0.3 0.5" 
-        rotation="-40 0 0" 
-        width="1" 
-        height="0.5"
-        autoplay="false"
-        playsinline
-        crossorigin="anonymous"
-        visible="false">
-      </a-video>
-    </a-marker>
-    <a-entity camera fov="20"></a-entity>
-  </a-scene>
-
-  <!-- Video oculto que se usa para reproducir en AR -->
-  <video id="videoAR" loop playsinline style="display: none;">
-    <source src="MVI_1034_1.mp4" type="video/mp4">
-    Tu navegador no soporta la reproducción de este video.
-  </video>
+  <!-- Contenedor para la realidad aumentada -->
+  <div id="ar-container"></div>
 
   <script>
-    var videoAR = document.getElementById('videoAR');
-    var arVideo = document.getElementById('arVideo');
-    var startButton = document.getElementById('startButton');
-    var buttonContainer = document.getElementById('buttonContainer');
-    var videoReady = false;
+    // Configuración inicial de MindAR.js
+    const startAR = async () => {
+      const mindarThree = new window.MindAR.IMAGE.MindARThree({
+        container: document.body,
+        imageTargetSrc: "hiro.mind", // Archivo de marcador Hiro
+      });
 
-    videoAR.addEventListener('loadeddata', function() {
-      console.log("Video cargado correctamente y listo para reproducirse.");
-      videoReady = true;
-    });
+      const { renderer, scene, camera } = mindarThree;
 
-    window.addEventListener('load', function () {
-      if (isMobile()) {
-        buttonContainer.classList.remove('hidden');
-      }
-    });
+      // Cargar video y texturizarlo en un plano
+      const video = document.createElement("video");
+      video.src = "MVI_1034_1.mp4"; // Ruta al video
+      video.loop = true;
+      video.crossOrigin = "anonymous";
+      video.playsInline = true;
 
-    function isMobile() {
-      return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    }
+      // Espera a que el video cargue y comience a reproducirse
+      video.addEventListener("canplay", () => video.play());
 
-    startButton.addEventListener('click', function () {
-      buttonContainer.classList.add('hidden');
-      startButton.blur();
-    });
+      // Crear un plano para mostrar el video
+      const videoTexture = new THREE.VideoTexture(video);
+      const planeGeometry = new THREE.PlaneGeometry(1, 0.6); // Ajusta el tamaño del plano
+      const planeMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
+      const videoPlane = new THREE.Mesh(planeGeometry, planeMaterial);
 
-    document.querySelector('a-marker').addEventListener('markerFound', function() {
-      if (videoReady) {
-        arVideo.setAttribute('src', '#videoAR');
-        arVideo.setAttribute('visible', 'true');
-        videoAR.currentTime = 0;  // Reinicia el video desde el inicio
-        videoAR.play().then(() => {
-          console.log("Reproducción de video iniciada.");
-        }).catch(error => {
-          console.error("Error al intentar reproducir el video: ", error);
-        });
-      } else {
-        console.error("El video aún no está listo para reproducirse.");
-      }
-    });
+      // Configurar el ancla para el marcador
+      const anchor = mindarThree.addAnchor(0); // Primer marcador en el archivo .mind
+      anchor.group.add(videoPlane);
 
-    document.querySelector('a-marker').addEventListener('markerLost', function() {
-      videoAR.pause();
-      arVideo.setAttribute('visible', 'false');
-    });
+      // Iniciar el sistema de AR
+      await mindarThree.start();
+
+      // Renderizar el contenido
+      const render = () => {
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+      };
+      render();
+    };
+
+    // Llamar a la función para iniciar
+    startAR();
   </script>
-
 </body>
 </html>
